@@ -1,109 +1,45 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.getElementById("year").textContent=new Date().getFullYear();
 
-    // =========================
-    // Product Selection
-    // =========================
+const form=document.getElementById("orderForm");
+const select=document.getElementById("productSelect");
+const msg=document.getElementById("orderMsg");
 
-    window.selectProduct = function (productName) {
+document.querySelectorAll(".add").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const product=btn.dataset.product;
+    const option=[...select.options].find(o=>o.textContent.startsWith(product));
+    if(option) select.value=option.value;
+    document.getElementById("order").scrollIntoView({behavior:"smooth"});
+  });
+});
 
-        const productSelect = document.getElementById("product");
-        const orderSection = document.getElementById("order");
-
-        if (productSelect) {
-            productSelect.value = productName;
-        }
-
-        if (orderSection) {
-            orderSection.scrollIntoView({
-                behavior: "smooth"
-            });
-        }
-
-    };
-
-
-    // =========================
-    // Order Form
-    // =========================
-
-    const orderForm = document.getElementById("orderForm");
-    const orderMessage = document.getElementById("orderMessage");
-
-
-    if (orderForm) {
-
-        orderForm.addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-
-            // Get form values
-            const name =
-                document.getElementById("name").value.trim();
-
-            const phone =
-                document.getElementById("phone").value.trim();
-
-            const product =
-                document.getElementById("product").value;
-
-            const address =
-                document.getElementById("address").value.trim();
-
-            const message =
-                document.getElementById("message").value.trim();
-
-
-            // Basic validation
-            if (!name || !phone || !product || !address) {
-
-                orderMessage.textContent =
-                    "অনুগ্রহ করে প্রয়োজনীয় সব তথ্য পূরণ করুন।";
-
-                orderMessage.style.color = "#d63384";
-
-                return;
-            }
-
-
-            // Bangladesh phone number validation
-            const phonePattern = /^01[3-9]\d{8}$/;
-
-            if (!phonePattern.test(phone)) {
-
-                orderMessage.textContent =
-                    "সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।";
-
-                orderMessage.style.color = "#d63384";
-
-                return;
-            }
-
-
-            // Temporary order confirmation
-            orderMessage.textContent =
-                "ধন্যবাদ " + name +
-                "! আপনার " + product +
-                " অর্ডারের তথ্য গ্রহণ করা হয়েছে।";
-
-
-            orderMessage.style.color = "#16834b";
-
-
-            // Show order details in browser console
-            console.log("New Order:");
-            console.log("Name:", name);
-            console.log("Phone:", phone);
-            console.log("Product:", product);
-            console.log("Address:", address);
-            console.log("Message:", message);
-
-
-            // Clear form
-            orderForm.reset();
-
-        });
-
-    }
-
+form.addEventListener("submit",(e)=>{
+  e.preventDefault();
+  const data=new FormData(form);
+  const phone=String(data.get("phone")).replace(/\s+/g,"");
+  if(!/^01\d{9}$/.test(phone)){
+    alert("সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর দিন।");
+    return;
+  }
+  if((data.get("payment")==="bKash" || data.get("payment")==="Nagad") && !String(data.get("transaction")).trim()){
+    alert("Online payment করলে Transaction ID দিন।");
+    return;
+  }
+  const order={
+    name:data.get("name"),
+    phone:data.get("phone"),
+    address:data.get("address"),
+    product:data.get("product"),
+    delivery:data.get("delivery"),
+    payment:data.get("payment"),
+    transaction:data.get("transaction"),
+    paidFrom:data.get("paidFrom"),
+    note:data.get("note"),
+    createdAt:new Date().toISOString()
+  };
+  console.log("PhoolLagbe order (demo):",order);
+  msg.hidden=false;
+  msg.textContent="অর্ডারের তথ্য নেওয়া হয়েছে। এখন এটি demo mode-এ আছে; Supabase database যুক্ত করলে অর্ডারটি আপনার admin panel-এ সংরক্ষিত হবে।";
+  form.reset();
+  msg.scrollIntoView({behavior:"smooth",block:"center"});
 });
