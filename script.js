@@ -1,45 +1,115 @@
-document.getElementById("year").textContent=new Date().getFullYear();
+document.getElementById("year").textContent = new Date().getFullYear();
 
-const form=document.getElementById("orderForm");
-const select=document.getElementById("productSelect");
-const msg=document.getElementById("orderMsg");
+const form = document.getElementById("orderForm");
+const select = document.getElementById("productSelect");
+const msg = document.getElementById("orderMsg");
 
-document.querySelectorAll(".add").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    const product=btn.dataset.product;
-    const option=[...select.options].find(o=>o.textContent.startsWith(product));
-    if(option) select.value=option.value;
-    document.getElementById("order").scrollIntoView({behavior:"smooth"});
+// Supabase
+const SUPABASE_URL = "https://tvjunaiofnsaxpqkftga.supabase.co";
+const SUPABASE_KEY = "sb_publishable_luOKViG1-9d55dba4KQ8rg_aQtwn3L3";
+
+// Product button
+document.querySelectorAll(".add").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const product = btn.dataset.product;
+
+    const option = [...select.options].find(
+      o => o.textContent.startsWith(product)
+    );
+
+    if (option) {
+      select.value = option.value;
+    }
+
+    document.getElementById("order").scrollIntoView({
+      behavior: "smooth"
+    });
   });
 });
 
-form.addEventListener("submit",(e)=>{
+// Order submit
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const data=new FormData(form);
-  const phone=String(data.get("phone")).replace(/\s+/g,"");
-  if(!/^01\d{9}$/.test(phone)){
+
+  const data = new FormData(form);
+
+  const phone = String(data.get("phone") || "").replace(/\s+/g, "");
+
+  // Check phone number
+  if (!/^01\d{9}$/.test(phone)) {
     alert("সঠিক ১১ সংখ্যার বাংলাদেশি মোবাইল নম্বর দিন।");
     return;
   }
-  if((data.get("payment")==="bKash" || data.get("payment")==="Nagad") && !String(data.get("transaction")).trim()){
+
+  // Check online payment transaction ID
+  if (
+    (data.get("payment") === "bKash" ||
+      data.get("payment") === "Nagad") &&
+    !String(data.get("transaction") || "").trim()
+  ) {
     alert("Online payment করলে Transaction ID দিন।");
     return;
   }
-  const order={
-    name:data.get("name"),
-    phone:data.get("phone"),
-    address:data.get("address"),
-    product:data.get("product"),
-    delivery:data.get("delivery"),
-    payment:data.get("payment"),
-    transaction:data.get("transaction"),
-    paidFrom:data.get("paidFrom"),
-    note:data.get("note"),
-    createdAt:new Date().toISOString()
+
+  // Show saving message
+  msg.hidden = false;
+  msg.textContent = "অর্ডারটি সংরক্ষণ করা হচ্ছে...";
+
+  // Data for Supabase
+  const order = {
+    customer_name: String(data.get("name") || "").trim(),
+    phone: phone,
+    address: String(data.get("address") || "").trim(),
+    product: String(data.get("product") || "").trim(),
+    delivery_time: String(data.get("delivery") || "").trim(),
+    payment_method: String(data.get("payment") || "").trim(),
+    transaction_id: String(data.get("transaction") || "").trim(),
+    payment_phone: String(data.get("paidFrom") || "").trim(),
+    notes: String(data.get("note") || "").trim()
   };
-  console.log("PhoolLagbe order (demo):",order);
-  msg.hidden=false;
-  msg.textContent="অর্ডারের তথ্য নেওয়া হয়েছে। এখন এটি demo mode-এ আছে; Supabase database যুক্ত করলে অর্ডারটি আপনার admin panel-এ সংরক্ষিত হবে।";
-  form.reset();
-  msg.scrollIntoView({behavior:"smooth",block:"center"});
+
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/orders`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify(order)
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Supabase error:", errorText);
+
+      throw new Error("Order save failed");
+    }
+
+    // Success
+    msg.textContent =
+      "✅ আপনার অর্ডার সফলভাবে গ্রহণ করা হয়েছে। আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।";
+
+    form.reset();
+
+    msg.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    msg.textContent =
+      "❌ অর্ডার সংরক্ষণ করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন অথবা আমাদের সাথে যোগাযোগ করুন।";
+
+    msg.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
 });
