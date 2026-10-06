@@ -1,5 +1,5 @@
 const SUPABASE_URL="https://tvjunajofnsaxpqkftga.supabase.co";
-const SUPABASE_KEY="YOUR_EXISTING_SUPABASE_PUBLISHABLE_KEY";
+const SUPABASE_KEY="sb_publishable_luOKViG1-9d55dba4KQ8rg_aQtwn3L3";
 
 const PRODUCTS=[
 {id:"rose",name:"গোলাপ",price:100,priceText:"১০টি — ১০০৳",image:"https://images.unsplash.com/photo-1494972308805-463bc619d34e?auto=format&fit=crop&w=900&q=88",desc:"তাজা সুন্দর গোলাপ—ভালোবাসা, surprise ও special moment-এর জন্য।",cats:["loved-one","love","birthday"]},
