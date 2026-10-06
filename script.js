@@ -6,7 +6,7 @@ const msg = document.getElementById("orderMsg");
 
 // Supabase
 const SUPABASE_URL = "https://tvjunaiofnsaxpqkftga.supabase.co";
-const SUPABASE_KEY = "sb_publishable_luOKViG1-9d55dba4KQ8rg_aQtwn3L3";
+const SUPABASE_KEY = "তোমার Supabase publishable key এখানে রাখবে";
 
 // Product button
 document.querySelectorAll(".add").forEach(btn => {
@@ -64,8 +64,7 @@ form.addEventListener("submit", async (e) => {
     delivery_time: String(data.get("delivery") || "").trim(),
     payment_method: String(data.get("payment") || "").trim(),
     transaction_id: String(data.get("transaction") || "").trim(),
-    payment_phone: String(data.get("paidFrom") || "").trim(),
-    notes: String(data.get("note") || "").trim()
+    status: "pending"
   };
 
   try {
@@ -85,9 +84,14 @@ form.addEventListener("submit", async (e) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Supabase error:", errorText);
 
-      throw new Error("Order save failed");
+      console.error(
+        "Supabase error:",
+        response.status,
+        errorText
+      );
+
+      throw new Error(errorText);
     }
 
     // Success
@@ -102,7 +106,7 @@ form.addEventListener("submit", async (e) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Order error:", error);
 
     msg.textContent =
       "❌ অর্ডার সংরক্ষণ করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন অথবা আমাদের সাথে যোগাযোগ করুন।";
