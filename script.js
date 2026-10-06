@@ -82,17 +82,17 @@ form.addEventListener("submit", async (e) => {
       }
     );
 
-    if (!response.ok) {
-      const errorText = await response.text();
+   if (!response.ok) {
+  const errorText = await response.text();
 
-      console.error(
-        "Supabase error:",
-        response.status,
-        errorText
-      );
+  console.error(
+    "Supabase error:",
+    response.status,
+    errorText
+  );
 
-      throw new Error(errorText);
-    }
+  throw new Error(errorText);
+}
 
     // Success
     msg.textContent =
@@ -106,14 +106,13 @@ form.addEventListener("submit", async (e) => {
     });
 
   } catch (error) {
-    console.error("Order error:", error);
+  console.error("ORDER ERROR:", error);
 
-    msg.textContent =
-      "❌ অর্ডার সংরক্ষণ করা যায়নি। অনুগ্রহ করে আবার চেষ্টা করুন অথবা আমাদের সাথে যোগাযোগ করুন।";
-
-    msg.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-  }
-});
+  msg.textContent =
+    "❌ Supabase Error: " + error.message;
+    
+  msg.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
