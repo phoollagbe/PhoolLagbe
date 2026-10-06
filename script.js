@@ -6,7 +6,7 @@ const msg = document.getElementById("orderMsg");
 
 // Supabase
 const SUPABASE_URL = "https://tvjunaiofnsaxpqkftga.supabase.co";
-const SUPABASE_KEY = "তোমার Supabase publishable key এখানে রাখবে";
+const SUPABASE_KEY = "sb_publishable_luOKViG1-9d55dba4KQ8rg_aQtwn3L3";
 
 // Product button
 document.querySelectorAll(".add").forEach(btn => {
