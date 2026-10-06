@@ -106,13 +106,14 @@ form.addEventListener("submit", async (e) => {
     });
 
   } catch (error) {
-  console.error("ORDER ERROR:", error);
+    console.error("ORDER ERROR:", error);
 
-  msg.textContent =
-    "❌ Supabase Error: " + error.message;
-    
-  msg.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
+    msg.textContent =
+      "❌ Supabase Error: " + error.message;
+
+    msg.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
 }
